@@ -1,0 +1,18 @@
+table {
+  border-collapse: collapse;
+}
+
+table,
+td,
+th {
+  border: 1px solid black;
+  padding: 5px;
+}
+
+tr.application-item th {
+  font-weight: normal;
+}
+
+tr.application-item th.application-control {
+  font-weight: bold;
+}

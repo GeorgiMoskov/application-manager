@@ -1,0 +1,34 @@
+<table>
+  <caption>
+    <h2>All Applications - short information </h2>
+  </caption>
+  <tr>
+    <th>ID</th>
+    <th>Name</th>
+    <th>Email</th>
+    <th>Age</th>
+    <th>Phone number</th>
+    <th>Preferred Way of Communication</th>
+    <th>English Level</th>
+    <th>Available to Start</th>
+    <!-- <th>Technical Skills and Courses</th> -->
+    <!-- <th>Short Personal Presentation</th> -->
+    <th>Study from home</th>
+  </tr>
+  <tr *ngFor="let application of applications" class="application-item">
+    <th>{{ application.id }}</th>
+    <th>{{ application.name }}</th>
+    <th>{{ application.email }}</th>
+    <th>{{ application.age }}</th>
+    <th>{{ application.phone }}</th>
+    <th>{{ application.preferredCommunication }}</th>
+    <th>{{ application.englishLevel }}</th>
+    <th>{{ application.availableToStart }}</th>
+    <!-- <th>{{ application.technicalSkillsAndCourses }}</th> -->
+    <!-- <th>{{ application.shortPersonalPresentation }}</th> -->
+    <th>{{ application.studyFromHome }}</th>
+    <th class="application-control"><button>view</button></th>
+    <th class="application-control"><button>edit</button></th>
+    <th class="application-control"><button>delete</button></th>
+  </tr>
+</table>
