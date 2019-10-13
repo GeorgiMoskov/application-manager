@@ -1,34 +1,37 @@
-<table>
-  <caption>
-    <h2>All Applications - short information </h2>
-  </caption>
-  <tr>
-    <th>ID</th>
-    <th>Name</th>
-    <th>Email</th>
-    <th>Age</th>
-    <th>Phone number</th>
-    <th>Preferred Way of Communication</th>
-    <th>English Level</th>
-    <th>Available to Start</th>
-    <!-- <th>Technical Skills and Courses</th> -->
-    <!-- <th>Short Personal Presentation</th> -->
-    <th>Study from home</th>
-  </tr>
-  <tr *ngFor="let application of applications" class="application-item">
-    <th>{{ application.id }}</th>
-    <th>{{ application.name }}</th>
-    <th>{{ application.email }}</th>
-    <th>{{ application.age }}</th>
-    <th>{{ application.phone }}</th>
-    <th>{{ application.preferredCommunication }}</th>
-    <th>{{ application.englishLevel }}</th>
-    <th>{{ application.availableToStart }}</th>
-    <!-- <th>{{ application.technicalSkillsAndCourses }}</th> -->
-    <!-- <th>{{ application.shortPersonalPresentation }}</th> -->
-    <th>{{ application.studyFromHome }}</th>
-    <th class="application-control"><button>view</button></th>
-    <th class="application-control"><button>edit</button></th>
-    <th class="application-control"><button>delete</button></th>
-  </tr>
-</table>
+<div class="application-list">
+  <app-view-edit-add-application *ngIf="this.showApplicationModal"
+    (newApplicationData)="this.onModalApplicationData($event)"
+    (closeApplicationModal)="this.showApplicationModal = false" [type]="this.applicationInActionType"
+    [applicationData]="this.applicationInAction">
+  </app-view-edit-add-application>
+
+  <button (click)="this.onAddClick()" class="addApplication">Add New Application</button>
+  <table>
+    <caption>
+      <h2>All Applications - essential information </h2>
+    </caption>
+    <tr>
+      <th>ID</th>
+      <th>Name</th>
+      <th>Email</th>
+      <th>Age</th>
+      <th>Phone number</th>
+      <th>Preferred Way of Communication</th>
+      <th>English Level</th>
+      <th>Available to Start</th>
+    </tr>
+    <tr *ngFor="let application of applications" class="application-item">
+      <th>{{ application.id }}</th>
+      <th>{{ application.name }}</th>
+      <th>{{ application.email }}</th>
+      <th>{{ application.age }}</th>
+      <th>{{ application.phone }}</th>
+      <th>{{ application.preferredCommunication }}</th>
+      <th>{{ application.englishLevel }}</th>
+      <th>{{ application.availableToStart }}</th>
+      <th class="application-control"><button (click)="this.onViewClick(application)">view</button></th>
+      <th class="application-control"><button (click)="this.onEditClick(application)">edit</button></th>
+      <th class="application-control"><button (click)="this.onDeleteClick(application)">delete</button></th>
+    </tr>
+  </table>
+</div>

@@ -1,12 +1,10 @@
 import { Injectable } from '@angular/core';
-import { ApplicationManagerModule } from './application-manager.module';
 import { BehaviorSubject, Observable, of } from 'rxjs';
-import { map, tap, catchError, flatMap } from 'rxjs/operators';
+import { map, tap, catchError, flatMap, take } from 'rxjs/operators';
 import { IApplication } from '../_models/application.model';
-import { ICreateApplication } from '../_models/createApplication.model';
 
 @Injectable({
-  providedIn: ApplicationManagerModule
+  providedIn: 'root'
 })
 export class ApplicationService {
   private $applicationsSubject: BehaviorSubject<IApplication[]>;
@@ -18,20 +16,81 @@ export class ApplicationService {
   }
 
   private initApplications(): void {
-    this.getApplicationsFromLocalStorage().subscribe(
-      (applications: IApplication[]) => {
-        if (applications) {
-          this.$applicationsSubject.next(applications);
-        }
+    this.getApplicationsFromLocalStorage().subscribe((applications: IApplication[]) => {
+      if (applications.length) {
+        this.$applicationsSubject.next(applications);
       }
-    )
+    });
   }
 
   public updateApplication(application: IApplication): Observable<IApplication[]> {
+    return this.updateApplicationInLocalStorage(application).pipe(
+      tap((data: IApplication[]) => {
+        this.$applicationsSubject.next(data);
+      })
+    );
+  }
+
+  public addApplication(application: IApplication): Observable<IApplication[]> {
+    return this.getUniqueIdFromLocalStorage().pipe(
+      map(
+        (id: number): IApplication => {
+          const newApplication: IApplication = { ...application };
+          newApplication.id = id;
+          return newApplication;
+        }
+      ),
+      flatMap(
+        (newApplication: IApplication): Observable<IApplication[]> => {
+          return this.addNewApplicationToLocalStorage(newApplication);
+        }
+      ),
+      tap((data: IApplication[]) => {
+        this.$applicationsSubject.next(data);
+      })
+    );
+  }
+
+  public deleteApplication(id: number): Observable<IApplication[]> {
+    return this.deleteApplicationInLocalStorage(id).pipe(
+      tap((data: IApplication[]) => {
+        this.$applicationsSubject.next(data);
+      })
+    );
+  }
+
+  private getUniqueIdFromLocalStorage(): Observable<number> {
+    let id: string = localStorage.getItem('id');
+    if (!id) {
+      return this.setUniqueIdInLocalStorage().pipe(
+        tap((id: number) => {
+          localStorage.setItem('id', String(Number(id) + 1));
+        })
+      );
+    }
+    localStorage.setItem('id', String(Number(id) + 1));
+    return of(Number(id));
+  }
+
+  private setUniqueIdInLocalStorage(): Observable<number> {
+    const id: number = 0;
+    localStorage.setItem('id', String(id));
+    return of(id).pipe(take(1));
+  }
+
+  private getApplicationsFromLocalStorage(): Observable<IApplication[]> {
+    const applications: IApplication[] =
+      <IApplication[]>JSON.parse(localStorage.getItem('applications')) || [];
+    return of(applications).pipe(take(1));
+  }
+
+  private updateApplicationInLocalStorage(application: IApplication): Observable<IApplication[]> {
     const $updatedApplications = this.getApplicationsFromLocalStorage().pipe(
       tap((data: IApplication[]) => {
-        if(!data.length) {
-          throw new Error('ApplicationService: updateApplication() => the application that you trying to update does not exist!');
+        if (!data.length || !data.find((item: IApplication) => item.id == application.id)) {
+          throw new Error(
+            'ApplicationService: updateApplication() => the application that you trying to update does not exist!'
+          );
         }
       }),
       map((data: IApplication[]) => {
@@ -40,8 +99,11 @@ export class ApplicationService {
             return application;
           }
           return item;
-        })
-        return of(newData);
+        });
+        return newData;
+      }),
+      flatMap((data: IApplication[]) => {
+        return this.setApplicationsInLocalStorage(data);
       }),
       catchError((err: Error) => {
         console.error(err.message);
@@ -49,47 +111,20 @@ export class ApplicationService {
       })
     );
 
-    return $updatedApplications.pipe(
+    return $updatedApplications;
+  }
+
+  private deleteApplicationInLocalStorage(id: number): Observable<IApplication[]> {
+    return this.getApplicationsFromLocalStorage().pipe(
+      map((data: IApplication[]) => {
+        return data.filter((item: IApplication) => {
+          return item.id != id;
+        });
+      }),
       flatMap((data: IApplication[]) => {
         return this.setApplicationsInLocalStorage(data);
-      }),
-      tap((data: IApplication[])=>{
-        this.$applicationsSubject.next(data);
-      }));
-  }
-
-  createApplication(application: ICreateApplication): void {
-    const newId = this.getUniqueIdFromLocalStorage();
-    const newApplication: IApplication = Object.create(application);
-    newApplication.id = newId;
-
-    this.addNewApplicationToLocalStorage(newApplication);
-
-    const newApplications: IApplication[] = [newApplication];
-
-    this.$applicationsSubject.next(newApplications);
-  }
-
-  private getUniqueIdFromLocalStorage(): number {
-    let id: string = localStorage.getItem('id');
-    if (id) {
-      localStorage.setItem('id', String(Number(id) + 1));
-      return Number(id);
-    }
-    return Number(this.setUniqueIdInLocalStorage());
-  }
-
-  private setUniqueIdInLocalStorage(): string {
-    const newId: string = String(0);
-    localStorage.setItem('id', newId);
-    return newId;
-  }
-
-  private getApplicationsFromLocalStorage(): Observable<IApplication[]> {
-    const applications: IApplication[] =
-      <IApplication[]>JSON.parse(localStorage.getItem('applications')) || [];
-    console.log('getApplicationsFromLocalStorage(): applications = ', applications);
-    return of(applications);
+      })
+    );
   }
 
   private setApplicationsInLocalStorage(applications: IApplication[]): Observable<IApplication[]> {
@@ -97,12 +132,12 @@ export class ApplicationService {
     return of(applications);
   }
 
-  private addNewApplicationToLocalStorage(application: IApplication): void {
-    this.getApplicationsFromLocalStorage().pipe(
-      map((data: IApplication[]) => {
+  private addNewApplicationToLocalStorage(application: IApplication): Observable<IApplication[]> {
+    return this.getApplicationsFromLocalStorage().pipe(
+      flatMap((data: IApplication[]) => {
         data.push(application);
         return this.setApplicationsInLocalStorage(data);
       })
-    )
+    );
   }
 }

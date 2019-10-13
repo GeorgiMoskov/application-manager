@@ -10,7 +10,7 @@ export interface IApplication {
   preferredCommunication: Communication; //radio buttons for Email and Phone, required
   englishLevel: EnglishLevel; // select with options, required
   availableToStart: Date; //date, required
-  technicalSkillsAndCourses: string; // text
-  shortPersonalPresentation: string; // text
-  studyFromHome: boolean; // checkbox
+  technicalSkillsAndCourses?: string | null | undefined; // text
+  shortPersonalPresentation?: string | null | undefined; // text
+  studyFromHome?: boolean | null | undefined; // checkbox
 }

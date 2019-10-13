@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { IApplication } from 'src/app/_models/application.model';
-import { Communication } from 'src/app/_models/communication.enum';
-import { EnglishLevel } from 'src/app/_models/english-level.enum';
+import { ApplicationService } from '../application.service';
+import { ApplicationModal } from 'src/app/_models/application-modal.enum';
 
 @Component({
   selector: 'app-application-list',
@@ -10,50 +10,50 @@ import { EnglishLevel } from 'src/app/_models/english-level.enum';
 })
 export class ApplicationListComponent implements OnInit {
   public applications: IApplication[] = [];
+  public showApplicationModal: boolean = false;
+  public applicationInAction: IApplication;
+  public applicationInActionType: ApplicationModal;
 
-  constructor() {}
+  constructor(private applicationManager: ApplicationService) {}
 
   ngOnInit() {
-    this.applications.push({
-      id: 0,
-      name: 'Georgi',
-      email: 'moskov120@abv.bg',
-      age: 23,
-      phone: '0876663015',
-      preferredCommunication: Communication.email,
-      englishLevel: EnglishLevel.B2,
-      availableToStart: new Date(),
-      technicalSkillsAndCourses: 'javascript and html',
-      shortPersonalPresentation: 'Im cool',
-      studyFromHome: true
+    this.applicationManager.$applications.subscribe((data: IApplication[]) => {
+      this.applications = data;
     });
+  }
 
-    this.applications.push({
-      id: 1,
-      name: 'Georgi',
-      email: 'moskov120@abv.bg',
-      age: 23,
-      phone: '0876663015',
-      preferredCommunication: Communication.email,
-      englishLevel: EnglishLevel.B2,
-      availableToStart: new Date(),
-      technicalSkillsAndCourses: 'javascript and html',
-      shortPersonalPresentation: 'Im cool',
-      studyFromHome: true
-    });
+  public onAddClick() {
+    this.applicationInAction = null;
+    this.applicationInActionType = ApplicationModal.add;
+    this.showApplicationModal = true;
+  }
 
-    this.applications.push({
-      id: 2,
-      name: 'Georgi',
-      email: 'moskov120@abv.bg',
-      age: 23,
-      phone: '0876663015',
-      preferredCommunication: Communication.email,
-      englishLevel: EnglishLevel.B2,
-      availableToStart: new Date(),
-      technicalSkillsAndCourses: 'javascript and html',
-      shortPersonalPresentation: 'Im cool',
-      studyFromHome: true
-    });
+  public onModalApplicationData(application: IApplication) {
+    this.showApplicationModal = false;
+    if (this.applicationInActionType == ApplicationModal.add) {
+      this.applicationManager.addApplication(application).subscribe();
+    }
+
+    if (this.applicationInActionType == ApplicationModal.edit) {
+      this.applicationManager.updateApplication(application).subscribe();
+    }
+  }
+
+  public onViewClick(application: IApplication) {
+    this.applicationInAction = application;
+    this.applicationInActionType = ApplicationModal.view;
+    this.showApplicationModal = true;
+  }
+
+  public onEditClick(application: IApplication) {
+    this.applicationInAction = application;
+    this.applicationInActionType = ApplicationModal.edit;
+    this.showApplicationModal = true;
+  }
+
+  public onEditA;
+
+  public onDeleteClick(application: IApplication) {
+    this.applicationManager.deleteApplication(application.id).subscribe();
   }
 }

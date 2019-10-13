@@ -1,0 +1,74 @@
+<div class="view-edit-add-application">
+  <div class="modal">
+    <h3>{{ this.type | uppercase }} APPLICATION</h3>
+    <div class="data-fields">
+      <div class="data-field">
+        <span>*name:</span> <input type="text" [formControl]="name"
+          [class.required]="this.name.touched && this.name.invalid">
+      </div>
+      <div class="data-field">
+        <span>*email:</span> <input type="email" [formControl]="email"
+          [class.required]="this.email.touched && this.email.invalid">
+      </div>
+
+      <div class="data-field">
+        <span>*age:</span> <input type="number" [formControl]="age"
+          [class.required]="this.age.touched && this.age.invalid">
+      </div>
+
+      <div class="data-field">
+        <span>*phone number:</span> <input type="number" [formControl]="phoneNumber"
+          [class.required]="this.phoneNumber.touched && this.phoneNumber.invalid">
+      </div>
+
+      <div class="data-field">
+        <span>*preferred way of communication:</span>
+        <input type="radio" name="way-of-communication" value="email" [formControl]="prefWayOfCommunication"
+          [checked]="true"> <span>email</span>
+        <input type="radio" name="way-of-communication" value="phone" [formControl]="prefWayOfCommunication">
+        <span>phone</span>
+      </div>
+
+      <div class="data-field">
+        <span>*english level:</span>
+        <select name="englishLevel" [formControl]="englishLevel">
+          <option value="A1" [selected]="true">A1</option>
+          <option value="A2">A2</option>
+          <option value="B1">B1</option>
+          <option value="B2">B2</option>
+          <option value="C1">C1</option>
+          <option value="C2">C2</option>
+        </select>
+      </div>
+
+      <div class="data-field">
+        <span>*available to start on:</span>
+        <input type="date" [formControl]="availableToStartOn"
+          [class.required]="this.availableToStartOn.touched && this.availableToStartOn.invalid">
+      </div>
+
+      <div class="data-field">
+        <span>technical skills and courses:</span>
+        <textarea rows="4" cols="50" [formControl]="technicalSkillsAndCourses"></textarea>
+      </div>
+
+      <div class="data-field">
+        <span>short personal presentation:</span>
+        <textarea rows="4" cols="50" [formControl]="shortPersonalPresentation"></textarea>
+      </div>
+
+      <div class="data-field">
+        <input type="checkbox" [formControl]="studyFromHome">
+        <span>study from home</span>
+      </div>
+
+    </div>
+    <div class="button-box">
+      <button *ngIf="this.type == 'add'" [disabled]="!this.checkAllFormControlsValidation()"
+        (click)="this.emitData()">add</button>
+      <button *ngIf="this.type == 'edit'" [disabled]="!this.checkAllFormControlsValidation()"
+        (click)="this.emitData()">edit</button>
+      <button (click)=" this.close()">close</button>
+    </div>
+  </div>
+</div>
