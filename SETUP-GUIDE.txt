@@ -1,0 +1,5 @@
+1. Clone this repository
+2. change directory to ./application-manager
+3. run "npm install"
+4. run "npm run start"
+5. navigate in internt browser to localhost:4200
